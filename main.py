@@ -1,6 +1,7 @@
 import sys
 import xml.etree.ElementTree as ET
-from collections import OrderedDict
+import argparse
+
 
 
 from CodeWriter import CodeWriter
@@ -20,11 +21,46 @@ CHILD_CELL = 0
 SOURCE = 0
 TARGET = 1
 
+__author__ = 'Jason Vasquez Orona'
 
-def main():
+
+def get_args():
+
+    parser = argparse.ArgumentParser()
+    parser.parse_args()
+
+    parser = argparse.ArgumentParser(
+        description='Application that converts a graph into P4 headers, parser and the rest of the template')
+    # Add arguments
+
+    parser.add_argument(
+        '-m', '--model', type=str, help='Model', required=True, )
+
+    parser.add_argument(
+        '-p', '--path', type=str, help='Port number', required=False, default=None, nargs='+')
+
+    parser.add_argument(
+        '-i', '--includes_folder', type=str, help='Separate folder for includes', required=False, default=False, action="store_true")
+
+    return parser.parse_args()
+
+
+def model_config(args):
+
+
+
+
+    pass
+
+
+def main(args):
 
     tree = ET.parse(sys.argv[1])
     root = tree.getroot()
+
+    code_writer = CodeWriter()
+
+    model_config(args)
 
     stage_num = 0
     stages = 0
@@ -136,16 +172,16 @@ def main():
             stage_ids.extend(next_stage_ids)
             next_stage_ids = []
 
-    code_writer = CodeWriter()
 
     code_writer.write_headers(graph.headers, graph.longest_hname)
-
     code_writer.write_parser(graph.headers, graph.states, graph.transitions)
-
-    #code_writer.write_defines()
+    code_writer.write_all_defines()
+    code_writer.write_main_file()
 
     print(graph)
 
 # Main body
 if __name__ == '__main__':
-    main()
+
+    args = get_args()
+    main(args)

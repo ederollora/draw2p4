@@ -31,3 +31,14 @@ class Header:
             if len(value) > self.longest_bw: self.longest_bw = len(value)
 
             self.fields.append(f)
+
+    def get_field_by_name(self, name):
+        field = ''
+        for f in self.fields:
+            if f.name == name:
+                field = f
+                break
+
+        return f
+
+

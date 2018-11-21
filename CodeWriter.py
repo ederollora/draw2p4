@@ -6,7 +6,9 @@ class CodeWriter:
     def __init__(self):
         self.name = ''
         self.fields = []
+        self.typedefs = []
         self.defines = []
+        self.consts = []
 
     def write_headers(self, headers, hname_length):
 
@@ -24,12 +26,12 @@ class CodeWriter:
 
         with open(HEADERS_FILE, 'a') as header_file:
             header_file.write((
-                                      HEADER_INIT +
-                                      (2 * OPENING_BLOCK) +
-                                      NEWLINE).format(header.name))
+                HEADER_INIT +
+                (2 * OPENING_BLOCK) +
+                NEWLINE).format(header.name))
             for field in header.fields:
                 header_file.write(
-                    ((4 * SPACE) + HEADER_LINE + NEWLINE).format(
+                    (INDENT + HEADER_LINE + NEWLINE).format(
                         field.bit_width,
                         ((header.longest_bw - len(str(field.bit_width))) * SPACE) + (2 * SPACE),
                         field.name)
@@ -37,29 +39,24 @@ class CodeWriter:
             header_file.write(CLOSING_BLOCK + (2 * NEWLINE))
 
         return ("{0}_t{1}{0};" + NEWLINE) \
-            .format(
-            header.name, ((hname_length - len(header.name)) * SPACE) + (2 * SPACE)
-        )
+            .format(header.name, ((hname_length - len(header.name)) * SPACE) + (2 * SPACE))
 
     def write_parser(self, headers, states, transitions):
 
         with open(PARSER_FILE, 'a') as parser_file:
             parser_file.write(
-                PARSER + SPACE + PARSER_BLOCK_NAME + OPENING_PT +
-                PACKET_IN + SPACE + PACKET_NAME + COMMA + NEWLINE +
-                (4 * INDENT) + OUT + SPACE + HEADERS_TYPE + SPACE + HEADER_NAME + COMMA + NEWLINE +
-                (4 * INDENT) + INOUT + SPACE + METADATA_TYPE + SPACE + METADATA_NAME + COMMA + NEWLINE +
-                (
-                        4 * INDENT) + INOUT + SPACE + SMETADATA_TYPE + SPACE + SMETADATA_NAME + CLOSING_PT + SPACE + OPENING_BLOCK + (
-                        3 * NEWLINE))
+                PARSER + SPACE + PARSER_NAME + OPENING_PT + self.packet_in_arg() + NEWLINE +
+                (4 * INDENT) + self.headers_arg() + NEWLINE +
+                (4 * INDENT) + self.metadata_arg() + NEWLINE +
+                (4 * INDENT) + self.smetadata_arg() + CLOSING_PT + SPACE + OPENING_BLOCK + (3 * NEWLINE))
 
             for state_id, state in sorted(states.items(), key=lambda s: s[1].stage):
                 print(state.name)
-                self.write_a_parse_block(state, transitions, states, parser_file)
+                self.write_a_parse_block(state, transitions, states, headers, parser_file)
 
             parser_file.write(CLOSING_BLOCK + (2 * NEWLINE))
 
-    def write_a_parse_block(self, current_state, transitions, states, file):
+    def write_a_parse_block(self, current_state, transitions, states, headers, file):
 
         FIRST = 0
 
@@ -104,6 +101,7 @@ class CodeWriter:
                 trans += 1
 
                 if states[transition.to_id].name == 'accept':
+                    print()
                     file.write((2 * INDENT) + TRANSITION_ACCEPT + NEWLINE)
                     continue
 
@@ -134,7 +132,10 @@ class CodeWriter:
                         on_value = '0x' + on_value
 
                 constant = on_field.upper() + "_" + states[transition.to_id].name.upper()
-                self.defines.append({constant: on_value})
+
+                if constant not in self.consts:
+                    bit_width = headers[from_header].get_field_by_name(on_field).bit_width
+                    self.consts.append({constant: (bit_width, on_value)})
 
                 file.write((3 * INDENT) + TRANSITION_LINE.format(constant, states[transition.to_id].parse_name) + NEWLINE)
 
@@ -145,5 +146,58 @@ class CodeWriter:
 
         file.write(INDENT + CLOSING_BLOCK + (2*NEWLINE))
 
-    def write_defines(self):
-        pass
+    def write_all_defines(self):
+        with open(DEFINES_FILE, 'a') as defines_file:
+            if not defines_file.tell():
+                defines_file.write((2 * NEWLINE))
+            for const in self.consts:
+                for const_name, (bit_width, value) in const.items():
+                    defines_file.write(CONSTANT_ENTRY.format(bit_width, const_name, value) + NEWLINE)
+
+    def write_main_file(self, args):
+
+        with open(MAIN_FILE, 'a') as main_file:
+            if not main_file.tell():
+                main_file.write((2 * NEWLINE))
+
+            for lib in self.libraries:
+                main_file.write()
+
+            main_file.write(NEWLINE)
+
+            for inc in self.includes:
+                main_file.write()
+
+            main_file.write(NEWLINE)
+
+            switch, body = self.switch_definition(args)
+
+            #block of switch definition
+            main_file(SWITCH_DEF.format(switch, body, MAIN_NAME))
+
+
+
+
+    def packet_in_arg(self):
+        return PACKET_IN + SPACE + PACKET_NAME + COMMA
+
+    def headers_arg(self):
+        return OUT + SPACE + HEADERS_TYPE + SPACE + HEADER_NAME + COMMA
+
+    def metadata_arg(self):
+        return INOUT + SPACE + METADATA_TYPE + SPACE + METADATA_NAME + COMMA
+
+    def smetadata_arg(self):
+        return INOUT + SPACE + SMETADATA_TYPE + SPACE + SMETADATA_NAME
+
+    def switch_definition(self, args):
+        model = MODELS[args.model]
+        switch = model.keys()[0]
+        body = ''
+
+        for element in model[switch]:
+            body += element + "()," + NEWLINE
+        return (switch, body)
+
+
+

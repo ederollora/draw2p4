@@ -1,21 +1,23 @@
 
+DEFINES_FILENAME = "defines"
+HEADERS_FILENAME = "headers"
+PARSER_FILENAME = "parser"
+MAIN_FILENAME = "switch"
+P4_EXTENSION = ".p4"
 
-DEFINES_FILE = "output/defines.p4"
-HEADERS_FILE = "output/headers.p4"
-PARSER_FILE = "output/parser.p4"
-MAIN_FILE = "output/switch.p4"
+OUTPUT_DIR = "output"
 
 
 MAIN_INCLUDE = "#include <core.p4>\n#include <v1model.p4>"
 INCLUDE_FILE = "#include %s.p4"
 
 HEADER_INIT = "header {0}_t"
-HEADER_LINE = "bit<{0}>{1}{2};"
+HEADER_LINE = "bit<{0}> {1} {2};"
 
 HEADERS_DEF = "struct headers"
 
 PARSER = "parser"
-PARSER_BLOCK_NAME = "MyParser"
+CONTROL = "control"
 
 PACKET_IN = "packet_in"
 PACKET_NAME = "packet"
@@ -39,11 +41,25 @@ TRANSITION_DIRECT = "transition {0};"
 TRANSITION_ACCEPT = "transition accept;"
 TRANS_DEFAULT = "default: accept;"
 
+DEFINE_ENTRY = "#define {0} {1}"
+CONSTANT_ENTRY = "const bit<{0}> {1} = {2};"
+TYPEDEF_ENTRY = "typedef bit<{0}> {1};"
+
+CORE_FILE = "core"
+V1MODEL_FILE = "v1model"
+IMPORT_LINE = "#include {0}"
+
+SWITCH_DEF = "{0} ({1}) {2};"
+CONTROL_BLOCK_DEF = "{0} {1} ({2})"
+
+MAIN_NAME = "main"
+
 OPENING_PT = "("
 CLOSING_PT = ")"
 OPENING_BLOCK = "{"
 CLOSING_BLOCK = "}"
 
+SLASH = "/"
 COMMA = ","
 DOT = "."
 SPACE = " "
@@ -54,3 +70,5 @@ BINARY_VALUES = ["binary", "bin", "b"]
 OCTAL_VALUES = ["octal", "oct", "o"]
 HEXADECIMAL_VALUES = ["hexadecimal", "hex", "h"]
 DECIMAL_VALUES = ["decimal", "dec", "d"]
+
+
