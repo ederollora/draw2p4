@@ -155,7 +155,6 @@ class CodeWriter:
                     defines_file.write(CONSTANT_ENTRY.format(bit_width, const_name, value) + NEWLINE)
 
     def write_main_file(self, args):
-
         with open(MAIN_FILE, 'a') as main_file:
             if not main_file.tell():
                 main_file.write((2 * NEWLINE))
@@ -170,13 +169,12 @@ class CodeWriter:
 
             main_file.write(NEWLINE)
 
+            for
+
             switch, body = self.switch_definition(args)
 
             #block of switch definition
-            main_file(SWITCH_DEF.format(switch, body, MAIN_NAME))
-
-
-
+            main_file.write(SWITCH_DEF.format(switch, body, MAIN_NAME))
 
     def packet_in_arg(self):
         return PACKET_IN + SPACE + PACKET_NAME + COMMA

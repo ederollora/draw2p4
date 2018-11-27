@@ -52,8 +52,6 @@ IMPORT_LINE = "#include {0}"
 SWITCH_DEF = "{0} ({1}) {2};"
 CONTROL_BLOCK_DEF = "{0} {1} ({2})"
 
-MAIN_NAME = "main"
-
 OPENING_PT = "("
 CLOSING_PT = ")"
 OPENING_BLOCK = "{"

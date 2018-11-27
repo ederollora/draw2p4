@@ -7,16 +7,116 @@
     "VerifyChecksumImpl" : "verify_checksum",
     "ComputeChecksumImpl" : "update_checksum"
   },
+  "file_names" : {
+    "main" : {
+      "VerifyChecksumImpl": {
+        "type" : "control",
+        "has_apply" : "True",
+        "args" : {
+          "hdr" : {
+            "type" : "headers_t",
+            "direction" : "inout"
+          },
+          "meta" : {
+            "type" : "metadata",
+            "direction" : "inout"
+          }
+        }
+      },
+      "IngressImpl": {
+        "type" : "control",
+        "has_apply" : "True",
+        "args" : {
+          "hdr" : {
+            "type" : "headers_t",
+            "direction" : "inout"
+          },
+          "meta" : {
+            "type" : "metadata",
+            "direction" : "inout"
+          },
+          "standard_metadata" : {
+            "type" : "standard_metadata_t",
+            "direction" : "inout"
+          }
+        }
+      },
+      "EgressImpl": {
+        "type" : "control",
+        "has_apply" : "True",
+        "args" : {
+          "hdr" : {
+            "type" : "headers_t",
+            "direction" : "inout"
+          },
+          "meta" : {
+            "type" : "metadata",
+            "direction" : "inout"
+          },
+          "standard_metadata" : {
+            "type" : "standard_metadata_t",
+            "direction" : "inout"
+          }
+        }
+      },
+      "ComputeChecksumImpl": {
+        "type" : "control",
+        "has_apply" : "True",
+        "args" : {
+          "hdr" : {
+            "type" : "headers_t",
+            "direction" : "inout"
+          },
+          "meta" : {
+            "type" : "metadata",
+            "direction" : "inout"
+          }
+        }
+      }
+    },
+    "headers" : {
+      "type" : "headers_t",
+      "var_name" : "hdr"
+    },
+    "parsers" : {
+      "ParserImpl" : {
+        "type" : "parser",
+        "has_apply" : "False",
+        "args" : {
+          "packet" : {
+            "type" : "packet_in"
+          },
+          "hdr" : {
+            "type" : "headers_t",
+            "direction" : "out"
+          },
+          "meta" : {
+            "type" : "metadata",
+            "direction" : "inout"
+          },
+          "standard_metadata" : {
+            "type" : "standard_metadata_t",
+            "direction" : "inout"
+          }
+        }
+      },
+      "DeparserImpl" : {
+        "type" : "control",
+        "has_apply" : "True",
+        "args" : {
+          "packet": {
+            "type": "packet_out"
+          },
+          "hdr": {
+            "type": "headers_t",
+            "direction": "in"
+          }
+        }
+      }
+    },
+    "defines" : {}
+  },
   "defines" : {},
   "constants" : {},
-  "typedefs" : {
-    "ipv4" : {
-      "bit_width" : "32",
-      "name"      : "ip4Addr_t"
-    },
-    "ethernet" : {
-      "bit_width" : "48",
-      "name"      : "macAddr_t"
-    }
-  }
+  "typedefs" : {}
 }
